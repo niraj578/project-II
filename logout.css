@@ -1,0 +1,22 @@
+.logout-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #dc3545; /* Bootstrap danger color */
+    color: white;
+    border: none;
+    border-radius: 0; /* Remove rounded corners for a box shape */
+    text-decoration: none; /* Remove underline */
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Optional: add shadow for depth */
+}
+
+.logout-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.logout-btn.active {
+    background-color: #ff4d4d; /* Highlight color when active */
+    transform: scale(1.05); /* Slightly enlarge the button */
+}

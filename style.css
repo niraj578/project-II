@@ -1,0 +1,473 @@
+url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,900&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif; /* Added fallback font */
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #479e81;
+    margin: 0;
+    padding: 0;
+}
+
+.banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px 100px;
+    color: white;
+    box-sizing: border-box;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo i {
+    margin-right: 20px;
+    font-size: 50px;
+    color: black;
+}
+
+.links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 10px 0;
+    background-color: black;
+    box-sizing: border-box;
+}
+
+.links a {
+    text-decoration: none;
+    color: rgb(243, 238, 238);
+    border-bottom: 3px solid transparent;
+    margin: 0 20px;
+    font-weight: 200;
+    text-align: left;
+    padding: 10px 0;
+}
+
+.links a:hover,
+.links a:focus {
+    border-bottom: 3px solid white;
+    transition: 0.5s;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.auth-buttons a {
+    padding: 10px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.login-btn {
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+}
+
+.login-btn:hover {
+    background-color: white;
+    color: #81834A;
+}
+
+.register-btn {
+    background-color: white;
+    border: 1px solid white;
+    color: #81834A;
+}
+
+.register-btn:hover {
+    background-color: transparent;
+    color: white;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 20px 100px;
+    margin-bottom: 50px; /* Add some bottom margin */
+}
+
+.title {
+    margin-top: -30px; /* Shift the title upwards */
+    text-align: center;
+    color: white;
+}
+
+.title h1 {
+    font-size: 50px;
+    color: white;
+}
+
+.title span {
+    color: black; /* Different color for the span */
+}
+
+.title h2 {
+    font-size: 24px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.title p {
+    max-width: 400px;
+    margin: 20px auto 30px;
+}
+
+.socials {
+    margin: 10px 0;
+}
+
+
+.socials h1 {
+    font-size: 20px; /* Adjust the font size as needed */
+    color: white; /* Change the text color */
+}
+
+.socials a {
+    color: rgb(201, 198, 198);
+    margin: 0 10px;
+}
+
+.socials a:hover,
+.socials a:focus {
+    color: white;
+    transition: 0.5s;
+}
+
+.footer {
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin-top: auto;
+}
+
+.copyright {
+    color: white;
+    font-size: 14px;
+}
+
+.copyright p {
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .banner {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .links {
+        flex-wrap: wrap; /* Allow links to wrap on small screens */
+        gap: 10px; /* Add space between wrapped items */
+    }
+
+    .links a {
+        margin: 5px 10px; /* Adjust margins for small screens */
+    }
+
+    .title h1 {
+        font-size: 40px; /* Adjusted font size for smaller screens */
+    }
+
+    .title h2 {
+        font-size: 20px; /* Adjusted font size for smaller screens */
+    }
+
+    .auth-buttons {
+        margin-top: 15px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .auth-buttons a {
+        width: 120px;
+        text-align: center;
+    }
+
+    .footer {
+        padding: 15px 0;
+    }
+}
+
+/* Services Section */
+.services-section {
+    padding: 60px 0;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.services-section h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 0 20px;
+}
+
+.service-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+}
+
+.service-card i {
+    font-size: 40px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.service-card h3 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+.service-card p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Featured Cars Section */
+.featured-cars {
+    padding: 60px 0;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.featured-cars h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 0 20px;
+}
+
+.car-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.car-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.car-card h3 {
+    padding: 15px;
+    margin: 0;
+    color: #333;
+}
+
+.car-card p {
+    padding: 0 15px;
+    color: #666;
+}
+
+.book-now {
+    display: inline-block;
+    margin: 15px;
+    padding: 10px 20px;
+    background-color: #81834A;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.book-now:hover {
+    background-color: #696B3D;
+}
+
+/* Why Choose Us Section */
+.why-choose-us {
+    padding: 60px 0;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.why-choose-us h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 0 20px;
+}
+
+.feature {
+    text-align: center;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.feature i {
+    font-size: 40px;
+    color: white;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.feature:hover i {
+    transform: scale(1.1);
+}
+
+.feature h3 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+.feature p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Update responsive design */
+@media (max-width: 768px) {
+    .services-grid,
+    .car-grid,
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .services-section,
+    .featured-cars,
+    .why-choose-us {
+        padding: 40px 0;
+    }
+}
+
+/* Add keyframes for the animation */
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Remove the old .car styling and add this new header banner style */
+.header-banner {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 40px;
+    margin-top: -20px; 
+}
+
+.header-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center -180px;
+}
+
+/* Update responsive design */
+@media (max-width: 768px) {
+    .header-banner {
+        height: 300px;
+        margin-top: 10px;
+    }
+    
+    .header-banner img {
+        object-position: center -30px;
+    }
+}
+
+
+.search-input {
+    padding: 5px; /* Padding inside the input */
+    margin-left: 800px; /* Space between links and search input */
+    border: none; /* Remove default border */
+    border-radius: 20px; /* Rounded corners */
+}
+
+.search-button {
+    padding: 5px 10px; /* Padding for the button */
+    margin-left: 5px; /* Space between input and button */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #81834A; /* Button background color */
+    color: white; /* Button text color */
+    cursor: pointer; /* Change cursor on hover */
+}
+
+.search-button:hover {
+    background-color: #696B3D; /* Darker background on hover */
+}
+
+.round-profile-btn {
+    display: inline-block; /* Ensures the button behaves like a block element */
+    width: 50px; /* Set width */
+    height: 50px; /* Set height */
+    border-radius: 50%; /* Makes the button round */
+    background-color: #007bff; /* Background color */
+    color: white; /* Text color */
+    text-align: center; /* Center the text */
+    line-height: 50px; /* Vertically center the text */
+    text-decoration: none; /* Remove underline from link */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.round-profile-btn:hover {
+    background-color: #0056b3; /* Darker background on hover */
+}

@@ -1,0 +1,92 @@
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+    background: linear-gradient(to bottom right, #003366, #66ccff); /* Gradient from dark blue to light blue */
+    color: #fff; /* White text color for contrast */
+    font-family: 'Arial', sans-serif; /* Font family */
+    line-height: 1.6; /* Line height for readability */
+}
+
+/* Container for main content */
+.container {
+    max-width: 1200px; /* Maximum width */
+    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Padding around the content */
+    background: rgba(255, 255, 255, 0.9); /* White background with transparency */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+/* Header styles */
+header {
+    background: rgba(0, 51, 102, 0.8); /* Semi-transparent dark blue */
+    color: white; /* Text color */
+    padding: 20px 0; /* Padding */
+    text-align: center; /* Centered text */
+}
+
+/* Footer styles */
+footer {
+    text-align: center; /* Centered text */
+    padding: 10px 0; /* Padding */
+    background: rgba(0, 51, 102, 0.8); /* Semi-transparent dark blue */
+    position: relative; /* Positioning */
+    bottom: 0; /* Stick to the bottom */
+    width: 100%; /* Full width */
+}
+
+/* Form styles */
+.search-form {
+    display: flex; /* Flexbox for layout */
+    justify-content: center; /* Center items */
+    margin: 20px 0; /* Margin */
+}
+
+.search-input {
+    padding: 10px; /* Padding */
+    border: 1px solid #ccc; /* Border */
+    border-radius: 5px; /* Rounded corners */
+    width: 300px; /* Width */
+}
+
+.search-button {
+    padding: 10px 15px; /* Padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #007bff; /* Button color */
+    color: white; /* Text color */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s; /* Transition effect */
+}
+
+.search-button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Car result styles */
+.car-result {
+    background: white; /* White background */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 15px; /* Padding */
+    margin: 10px 0; /* Margin */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .search-form {
+        flex-direction: column; /* Stack items vertically */
+    }
+
+    .search-input {
+        width: 100%; /* Full width on small screens */
+        margin-bottom: 10px; /* Margin below input */
+    }
+} 

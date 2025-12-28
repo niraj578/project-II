@@ -1,0 +1,172 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #67e9a2;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+h1 {
+    color: #080808;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #0b0c0c;
+    margin-top: 20px;
+}
+ul{}
+
+/* Car Images Section */
+.car-images {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    overflow: hidden; /* Hide overflow for sliding effect */
+}
+
+.car-images img {
+    margin: 10px;
+    border-radius: 58px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 500px; /* Increased width for images */
+    height:auto ; /* Maintain aspect ratio */
+    opacity: 0; /* Start hidden for animation */
+    transform: translateX(-100%); /* Start off-screen */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Smooth transition */
+}
+
+/* Booking Button */
+.book-now {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 10px;
+    text-align: center;
+    background-color: #27ae60;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+.book-now:hover {
+    background-color: #219653;
+}
+
+/* Booking Options Form */
+#booking-options {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+#booking-form label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+#booking-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#booking-form button {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#booking-form button:hover {
+    background-color: #1c598a;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .car-images {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .book-now {
+        width: 100%;
+    }
+}
+
+/* Features List Styles */
+ul {
+    list-style-type: none; /* Remove default bullet points */
+    padding: 0; /* Remove default padding */
+    margin: 20px 0; /* Add margin for spacing */
+    background-color: #ffffff; /* White background for the list */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    max-width: 500px;
+}
+
+li {
+    padding: 15px; /* Padding for list items */
+    border-bottom: 1px solid #e0e0e0; /* Light border between items */
+    transition: background-color 0.3s; /* Smooth background color transition */
+}
+
+li:last-child {
+    border-bottom: none; /* Remove border from the last item */
+}
+
+li:hover {
+    background-color: #f9f9f9; /* Light gray background on hover */
+}
+
+strong {
+    color: #2980b9; /* Color for feature names */
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    border-radius: 8px; /* Rounded corners */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

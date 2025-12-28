@@ -1,0 +1,112 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #81834A;
+}
+
+.register-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+}
+
+.register-box {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #81834A;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-btn i {
+    margin-right: 5px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #81834A;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 40px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #81834A;
+}
+
+.terms {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.terms label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.terms input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #81834A;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #81834A;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #696B3D;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 16px;
+}
