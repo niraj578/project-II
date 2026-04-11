@@ -1,17 +1,28 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    include 'connection.php'; // Include database connection
+
     $name = htmlspecialchars($_POST['name']);
     $email = htmlspecialchars($_POST['email']);
     $message = htmlspecialchars($_POST['message']);
 
-    // Prepare the message to be saved
-    $fullMessage = "Name: $name\nEmail: $email\nMessage: $message\n\n";
+    // Prepare and bind
+    $stmt = $conn->prepare("INSERT INTO messages (name, email, message) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $name, $email, $message);
 
-    // Save the message to a text file
-    file_put_contents('messages.txt', $fullMessage, FILE_APPEND);
+    if ($stmt->execute()) {
+        // Also save to text file as backup (optional, keeping original behavior)
+        $fullMessage = "Name: $name\nEmail: $email\nMessage: $message\n\n";
+        file_put_contents('messages.txt', $fullMessage, FILE_APPEND);
 
-    // Redirect back to the contact page or a thank you page
-    header('Location: contact.php?status=success');
+        header('Location: contact.php?status=success');
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
     exit();
 }
+
 ?> 

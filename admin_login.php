@@ -39,93 +39,53 @@ if (isset($_POST['login'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CAR RENTAL SERVICE</title>
-    <link rel="stylesheet" href="login-style.css">
+    <title>Admin Login - CAR RENTAL SERVICE</title>
+    <link rel="stylesheet" href="login-style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        /* Add some basic styles for the layout */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #6a11cb, #2575fc); /* Gradient background */
+        :root {
+            --primary-color: #ff4b2b;
+            --secondary-color: #ff416c;
+            --accent-color: #ff4b2b;
         }
         .login-box {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            width: 400px; /* Fixed width for better layout */
-            text-align: center; /* Center text */
-        }
-        h2 {
-            margin-bottom: 20px;
-            color: #333; /* Darker color for the heading */
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-group i {
-            margin-right: 10px;
-            color: #007BFF; /* Icon color */
-        }
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            transition: border-color 0.3s; /* Smooth transition for border color */
-        }
-        .input-group input:focus {
-            border-color: #007BFF; /* Change border color on focus */
-            outline: none; /* Remove default outline */
+            border-top: 4px solid var(--primary-color);
         }
         button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px; /* Increase font size */
-            transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
         }
         button:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px); /* Slight lift effect on hover */
+            box-shadow: 0 6px 20px rgba(255, 75, 43, 0.4);
         }
-        .register-link {
-            margin-top: 15px;
-            text-align: center;
-            color: #555; /* Slightly lighter color for the link */
-        }
-        .register-link a {
-            color: #007BFF; /* Link color */
-            text-decoration: none; /* Remove underline */
-            transition: color 0.3s; /* Smooth transition for color */
-        }
-        .register-link a:hover {
-            color: #0056b3; /* Darker color on hover */
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(255, 75, 43, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>Admin Login</h2>
-        <form action="admin_login.php" method="POST">
-            <div class="input-group">
-                <i class=""></i>
-                <input type="email" name="email" placeholder="Email" required>
-            </div>
-            <div class="input-group">
-                <i class=""></i>
-                <input type="password" name="password" placeholder="Password" required>
-            </div>
-            <button type="submit" name="login">Login</button>
-        </form>
+    <div class="background-iframe-container">
+        <iframe src="index.php" frameborder="0"></iframe>
+        <div class="overlay-blur"></div>
+    </div>
+    <div class="login-container">
+        <div class="login-box">
+            <a href="index.php" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+            <h2 style="color: white; margin-top: 10px;">Admin Portal</h2>
+            <p style="color: rgba(255,255,255,0.6); margin-bottom: 30px;">Authorized Access Only</p>
+            <form action="admin_login.php" method="POST">
+                <div class="input-group">
+                    <input type="email" name="email" placeholder="Admin Email" required>
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Password" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="submit" name="login">Access Dashboard</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

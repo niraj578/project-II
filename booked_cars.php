@@ -44,48 +44,36 @@ $result = $conn->query($sql);
             box-sizing: border-box;
         }
 
-        body {
-            display: flex;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            height: 100vh; /* Ensure body takes full height */
+        /* Main Content Layout (No Sidebar) */
+        .main-content {
+            width: 98%;
+            max-width: 1600px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
 
-        .sidebar {
-            width: 250px;
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 15px;
             background-color: #007BFF;
             color: white;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            height: 100vh; /* Full height sidebar */
-            position: fixed; /* Fix the sidebar to the left */
-        }
-
-        .sidebar h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        .sidebar a {
-            display: block;
-            margin: 10px 0;
             text-decoration: none;
-            color: white;
-            padding: 10px;
             border-radius: 5px;
-            transition: background-color 0.3s;
+            font-weight: bold;
         }
-
-        .sidebar a:hover {
+        .back-btn:hover {
             background-color: #0056b3;
         }
 
-        .main-content {
-            flex-grow: 1;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            min-height: 100vh;
             padding: 20px;
-            margin-left: 250px; /* Leave space for the sidebar */
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -126,7 +114,9 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
-    <h1>Booked Cars</h1>
+    <div class="main-content">
+        <a href="admin_dash.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <h1>Booked Cars</h1>
     <div class="booked-cars-list">
         <?php if ($result && $result->num_rows > 0): ?>
             <table>
@@ -164,6 +154,7 @@ $result = $conn->query($sql);
         <?php else: ?>
             <p>No cars have been booked yet.</p>
         <?php endif; ?>
+    </div>
     </div>
 
     <?php

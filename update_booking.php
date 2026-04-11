@@ -28,6 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Validate status
         $valid_statuses = array('approved', 'declined', 'cancelled', 'pending');
         if (in_array($status, $valid_statuses)) {
+            // Apply FCFS Algorithm before approving (REMOVED)
+            if ($status == 'approved') {
+                // FCFS check removed as per requirement.
+                // Just proceed to update booking status.
+            }
+
             // Update booking status
             $sql = "UPDATE bookings SET status = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);

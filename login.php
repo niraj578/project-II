@@ -38,7 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $row['password'])) {
             // Password is correct, start session and redirect
             $_SESSION['login'] = $row; // Store user data in session
-            header("Location: dashboard.php");
+            $_SESSION['just_logged_in'] = true; // Flag for Iron Man arrival
+            header("Location: index.php");
             exit();
         } else {
             // Invalid password
@@ -68,45 +69,26 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - CAR RENTAL SERVICE</title>
-    <link rel="stylesheet" href="login-style.css">
+    <link rel="stylesheet" href="login-style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <style>
-        .input-group {
-            position: relative; /* Position relative for absolute positioning of icons */
-            margin-bottom: 15px; /* Space between input groups */
-        }
-
-        .input-group i {
-            position: absolute; /* Position the icon absolutely */
-            right: 10px; /* Space from the right */
-            top: 50%; /* Center vertically */
-            transform: translateY(-50%); /* Adjust for vertical centering */
-            color: #888; /* Icon color */
-        }
-
-        .input-group input {
-            padding-right: 30px; /* Space for the icon */
-            width: 100%; /* Full width */
-            padding: 10px; /* Padding inside the input */
-            border: 1px solid #ccc; /* Border style */
-            border-radius: 5px; /* Rounded corners */
-            font-size: 16px; /* Font size */
-        }
-    </style>
 </head>
 <body>
+    <div class="background-iframe-container">
+        <iframe src="index.php" frameborder="0"></iframe>
+        <div class="overlay-blur"></div>
+    </div>
     <div class="login-container">
         <div class="login-box">
             <a href="index.php" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
             <h2>User Login</h2>
             <form action="login.php" method="POST">
                 <div class="input-group">
-                    <i class="fa-solid fa-user"></i>
                     <input type="email" name="email" placeholder="Email" required>
+                    <i class="fa-solid fa-user"></i>
                 </div>
                 <div class="input-group">
-                    <i class="fa-solid fa-lock"></i>
                     <input type="password" name="password" placeholder="Password" required>
+                    <i class="fa-solid fa-lock"></i>
                 </div>
                 <div class="remember-forgot">
                     <label><input type="checkbox"> Remember me</label>

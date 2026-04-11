@@ -1,5 +1,6 @@
 <?php
 session_start(); // Start the session
+include 'connection.php';
 
 // Check if the user is logged in
 $isLoggedIn = isset($_SESSION['login']);
@@ -8,7 +9,33 @@ if (!$isLoggedIn) {
     exit();
 }
 
+$email = $_SESSION['login']['email'];
 $username = $_SESSION['login']['full_name']; // Get the username
+
+// Fetch latest booking for the user to get price and details
+$sql = "SELECT b.*, c.name as car_name, c.model as car_model, c.price as car_price 
+        FROM bookings b 
+        JOIN cars c ON b.carid = c.carid 
+        WHERE b.email = ? 
+        ORDER BY b.id DESC LIMIT 1";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$booking = $stmt->get_result()->fetch_assoc();
+
+$totalAmount = 0;
+$days = 0;
+if ($booking) {
+    try {
+        $date1 = new DateTime($booking['booking_from']);
+        $date2 = new DateTime($booking['booking_to']);
+        $interval = $date1->diff($date2);
+        $days = $interval->days + 1;
+        $totalAmount = $days * $booking['car_price'];
+    } catch (Exception $e) {
+        $totalAmount = 0;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -17,168 +44,234 @@ $username = $_SESSION['login']['full_name']; // Get the username
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payments - Car Rental Service</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent-color: #00c6ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f4f8; /* Grayish background for the page */
-            display: flex;
+            font-family: 'Outfit', sans-serif;
+            background-color: #030303;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .dashboard-container {
-            display: flex;
-            width: 100%;
+        /* Background Effects */
+        .background-iframe-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            overflow: hidden;
         }
-
-        .sidebar {
-            width: 250px; /* Width of the sidebar */
-            background-color: #007bff; /* Solid blue background */
-            color: white; /* White text color */
-            padding: 20px; /* Padding inside the sidebar */
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Shadow effect */
+        .background-iframe-container iframe {
+            width: 100%; height: 100%; border: none; pointer-events: none;
+            transform: scale(1.1); filter: brightness(0.2) blur(10px);
         }
-
-        .sidebar h2 {
-            margin: 0 0 20px; /* Margin for the heading */
-        }
-
-        .sidebar ul {
-            list-style-type: none; /* Remove bullet points */
-            padding: 0; /* Remove padding */
-        }
-
-        .sidebar ul li {
-            margin: 10px 0; /* Margin between items */
-        }
-
-        .sidebar ul li a {
-            color: white; /* Link color */
-            text-decoration: none; /* Remove underline */
-            display: block; /* Make the link fill the list item */
-            padding: 10px; /* Padding for the link */
-            transition: background-color 0.3s; /* Smooth transition for hover effect */
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #0056b3; /* Darker background on hover */
+        .overlay-vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
         }
 
         .main-content {
-            flex: 1; /* Take the remaining space */
-            padding: 20px; /* Padding for the main content */
-            background-color: white; /* White background for main content */
-            margin-left: 20px; /* Space between sidebar and main content */
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            width: 95%; max-width: 900px; margin: 60px auto;
+            padding: 50px; background: var(--glass-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            position: relative; z-index: 10;
         }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 10px; color: var(--text-muted);
+            text-decoration: none; transition: all 0.3s ease; font-weight: 500; margin-bottom: 30px;
+        }
+        .back-btn:hover { color: var(--text-main); transform: translateX(-5px); }
 
         h1 {
-            color: #333; /* Darker text color for headings */
-            font-size: 2.5rem; /* Larger font size for the main heading */
-            margin-bottom: 20px; /* Space below the heading */
-            text-align: center; /* Center the heading */
+            color: white; font-weight: 600; margin-bottom: 40px; text-align: center;
+            font-size: 2.2rem; letter-spacing: 1px;
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
+
+        .payment-methods {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;
+        }
+
+        .method-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+
+        .method-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .method-card i {
+            font-size: 45px; margin-bottom: 20px;
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .method-card h3 { margin: 0 0 10px; color: white; font-weight: 600; }
+        .method-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
 
         .payment-form {
-            max-width: 600px; /* Limit the width of the form */
-            margin: 0 auto; /* Center the form */
-            padding: 20px; /* Padding inside the form */
-            border: 1px solid #007BFF; /* Border for the form */
-            border-radius: 8px; /* Rounded corners */
-            background-color: #f9f9f9; /* Light background for the form */
+            margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--glass-border);
+            animation: fadeIn 0.4s ease;
         }
 
-        .payment-form label {
-            display: block; /* Make labels block elements */
-            margin-bottom: 5px; /* Space below labels */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white; padding: 16px; border: none; border-radius: 12px;
+            cursor: pointer; font-size: 1.1rem; font-weight: 600; width: 100%;
+            margin-top: 25px; transition: transform 0.2s;
         }
 
-        .payment-form input {
-            width: 100%; /* Full width for inputs */
-            padding: 10px; /* Padding inside inputs */
-            margin-bottom: 15px; /* Space below inputs */
-            border: 1px solid #ccc; /* Border for inputs */
-            border-radius: 4px; /* Rounded corners */
+        .confirm-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
+
+        .hidden { display: none; }
+
+        .payment-icon-lg { 
+            font-size: 70px; margin-bottom: 25px; display: block; text-align: center; 
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        .payment-form button {
-            background-color: #007BFF; /* Button color */
-            color: white; /* Button text color */
-            padding: 10px 15px; /* Padding for button */
-            border: none; /* Remove border */
-            border-radius: 5px; /* Rounded corners */
-            cursor: pointer; /* Pointer cursor on hover */
-            font-size: 16px; /* Font size for button */
+        .booking-summary {
+            background: rgba(0, 198, 255, 0.1);
+            border: 1px solid rgba(0, 198, 255, 0.2);
+            border-radius: 16px; padding: 25px; margin-bottom: 40px;
         }
 
-        .payment-form button:hover {
-            background-color: #0056b3; /* Darker button color on hover */
+        .summary-header {
+            font-size: 0.85rem; text-transform: uppercase; color: #00c6ff; font-weight: 700;
+            margin-bottom: 15px; display: block; letter-spacing: 1px;
         }
 
-        .hidden {
-            display: none; /* Hide elements with this class */
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1rem; }
+        .summary-label { color: var(--text-muted); }
+        .summary-value { font-weight: 600; color: white; }
+        .summary-total { 
+            font-size: 1.3rem; color: #10b981; border-top: 1px solid rgba(255,255,255,0.1); 
+            padding-top: 15px; margin-top: 15px; 
         }
+
+        .change-method-btn {
+            background: rgba(255,255,255,0.05); color: var(--text-muted);
+            width: 100%; margin-top: 15px; border: 1px solid var(--glass-border); cursor: pointer;
+            padding: 12px; border-radius: 10px; transition: 0.3s;
+        }
+        .change-method-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+
     </style>
     <script>
         function showPaymentForm(method) {
             document.getElementById('payment-options').classList.add('hidden');
+            document.getElementById('payment-options-title').classList.add('hidden');
             if (method === 'cash') {
                 document.getElementById('cash-form').classList.remove('hidden');
             } else if (method === 'online') {
                 document.getElementById('online-form').classList.remove('hidden');
             }
         }
+
+        function goBackToOptions() {
+            document.getElementById('cash-form').classList.add('hidden');
+            document.getElementById('online-form').classList.add('hidden');
+            document.getElementById('payment-options').classList.remove('hidden');
+            document.getElementById('payment-options-title').classList.remove('hidden');
+        }
     </script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <h2>Dashboard</h2>
-            <ul>
-                <li><a href="dashboard.php">My Bookings</a></li>
-                <li><a href="my_profile.php">My Profile</a></li>
-                <li><a href="payments.php">Payments</a></li>
-                <li><a href="logout.php">Logout</a></li>
-            </ul>
-        </div>
-        <div class="main-content">
-            <div id="payment-options">
-                <h1>Choose Payment Method</h1>
-                <div>
-                    <label>
-                        <input type="radio" name="payment_method" value="cash" onclick="showPaymentForm('cash')" required>
-                        Cash on Delivery
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <input type="radio" name="payment_method" value="online" onclick="showPaymentForm('online')" required>
-                        Online Payment
-                    </label>
-                </div>
-            </div>
-
-            <div id="cash-form" class="hidden payment-form">
-                <h1>Cash on Delivery</h1>
-                <p>Please have the exact amount ready for the delivery.</p>
-                <button onclick="alert('Cash on Delivery selected!')">Confirm Cash on Delivery</button>
-            </div>
-
-            <div id="online-form" class="hidden payment-form">
-                <h1>Online Payment</h1>
-                
-              <?php
-                include 'payment.php';
-                        ?>
-            </div>
-    
-            <div>
-      
+    <div class="background-iframe-container">
+        <iframe src="index.php" frameborder="0"></iframe>
+        <div class="overlay-vignette"></div>
     </div>
-        </div>
+
+    <div class="main-content">
+        <a href="dashboard.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
         
+        <h1 id="payment-options-title">Secure Payment</h1>
+
+        <?php if ($booking): ?>
+        <div class="booking-summary">
+            <span class="summary-header">Booking Summary</span>
+            <div class="summary-row">
+                <span class="summary-label">Vehicle</span>
+                <span class="summary-value"><?php echo htmlspecialchars($booking['car_name'] . ' ' . $booking['car_model']); ?></span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Duration</span>
+                <span class="summary-value"><?php echo $days; ?> Day(s)</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Price per Day</span>
+                <span class="summary-value">NRS <?php echo number_format($booking['car_price'], 2); ?></span>
+            </div>
+            <div class="summary-row summary-total">
+                <span class="summary-label">Total Amount</span>
+                <span class="summary-value">NRS <?php echo number_format($totalAmount, 2); ?></span>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <div id="payment-options" class="payment-methods">
+            <div class="method-card" onclick="showPaymentForm('cash')">
+                <i class="fas fa-money-bill-wave"></i>
+                <h3>Cash on Delivery</h3>
+                <p>Pay when you receive the car</p>
+            </div>
+            <div class="method-card" onclick="showPaymentForm('online')">
+                <i class="fas fa-wallet"></i>
+                <h3>eSewa Payment</h3>
+                <p>Pay securely via eSewa</p>
+            </div>
+        </div>
+
+        <div id="cash-form" class="hidden payment-form">
+            <i class="fas fa-hand-holding-usd payment-icon-lg"></i>
+            <h1>Cash on Delivery</h1>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 1.1rem;">
+                Confirm your booking with the total amount of <strong style="color: white;">NRS <?php echo number_format($totalAmount, 2); ?></strong> to be paid upon delivery.
+            </p>
+            <button class="confirm-btn" onclick="alert('Cash on Delivery selected for NRS <?php echo number_format($totalAmount, 2); ?>!')">Confirm Booking</button>
+            <button class="change-method-btn" onclick="goBackToOptions()">Change Method</button>
+        </div>
+
+        <div id="online-form" class="hidden payment-form">
+            <i class="fas fa-wallet payment-icon-lg"></i>
+            <h1>eSewa Payment</h1>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 1.1rem;">
+                You are paying <strong style="color: white;">NRS <?php echo number_format($totalAmount, 2); ?></strong> for your booking.
+            </p>
+            <div style="margin: 20px 0; text-align: center;">
+                <form action="esewa_initiate.php" method="POST">
+                    <button type="submit" style="background-color: #60bb46; color: white; border: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;">
+                        <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" style="height: 20px;">
+                        Pay with eSewa
+                    </button>
+                </form>
+            </div>
+            <button class="change-method-btn" onclick="goBackToOptions()">Change Method</button>
+        </div>
     </div>
  
 </body>

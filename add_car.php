@@ -28,6 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $carModel = $_POST['carModel'];
     $carYear = $_POST['carYear'];
     $carPrice = $_POST['carPrice'];
+    $carType = $_POST['carType'];
 
     // Handle file upload
     $targetDir = "uploads/"; // Directory to save uploaded images
@@ -67,8 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // If everything is ok, try to upload file
         if (move_uploaded_file($_FILES["carImage"]["tmp_name"], $targetFile)) {
             // Prepare and bind
-            $stmt = $conn->prepare("INSERT INTO cars (carid, name, model, year, price, image) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss", $carid, $carName, $carModel, $carYear, $carPrice, $targetFile);
+            $stmt = $conn->prepare("INSERT INTO cars (carid, name, model, year, price, image, type) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssss", $carid, $carName, $carModel, $carYear, $carPrice, $targetFile, $carType);
 
             // Execute the statement
             if ($stmt->execute()) {
@@ -96,8 +97,18 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Car - CAR RENTAL SERVICE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        /* Basic Reset */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -105,109 +116,252 @@ $conn->close();
         }
 
         body {
-            background: linear-gradient(135deg, #e0f7fa, #80deea); /* Professional gradient from light cyan to teal */
+            font-family: 'Outfit', sans-serif;
+            background-color: #030303;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            font-family: Arial, sans-serif; /* Ensure a clean font */
-            padding: 20px;
+            justify-content: center;
+        }
+
+        /* Background Effects */
+        .background-iframe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .background-iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+            transform: scale(1.1);
+            filter: brightness(0.2) blur(10px);
+        }
+
+        .overlay-vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+        }
+
+        .main-content {
+            width: 95%;
+            max-width: 800px;
+            padding: 50px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
         }
 
         h1 {
-            margin-bottom: 20px;
-            font-size: 28px;
-            color: #333;
+            font-size: 32px;
+            font-weight: 600;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            color: var(--text-main);
+            transform: translateX(-5px);
         }
 
         form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px; /* Limit the width of the form */
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
         }
 
-        form div {
-            margin-bottom: 15px;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+        .full-width {
+            grid-column: span 2;
         }
 
-        form input {
-            width: 100%;
+        label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: 5px;
+        }
+
+        input, select {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: white;
+            font-family: inherit;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #ff4b2b;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(255, 75, 43, 0.1);
+        }
+
+        input[type="file"] {
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            transition: border-color 0.3s;
-        }
-
-        form input:focus {
-            border-color: #007BFF; /* Change border color on focus */
-            outline: none; /* Remove default outline */
+            cursor: pointer;
         }
 
         button {
-            padding: 10px;
-            background-color: #007BFF;
+            grid-column: span 2;
+            padding: 16px;
+            background: var(--primary-gradient);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            width: 100%; /* Make button full width */
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 10px 20px rgba(255, 65, 108, 0.2);
         }
 
         button:hover {
-            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 65, 108, 0.4);
         }
 
         .message {
-            margin-top: 20px;
-            color: green;
-            font-weight: bold;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
         }
     </style>
 </head>
 <body>
-    <h1>Add a Car</h1>
-    <form action="add_car.php" method="POST" enctype="multipart/form-data">
-        <div>
-            <label for="carid">Car ID:</label>
-            <input type="text" id="carid" name="carid" required>
-        </div>
-        <div>
-            <label for="carName">Car Name:</label>
-            <input type="text" id="carName" name="carName" required>
-        </div>
-        <div>
-            <label for="carModel">Car Model:</label>
-            <input type="text" id="carModel" name="carModel" required>
-        </div>
-        <div>
-            <label for="carYear">Year:</label>
-            <input type="number" id="carYear" name="carYear" required>
-        </div>
-        <div>
-            <label for="carPrice">Price per Day (NRS):</label>
-            <input type="number" id="carPrice" name="carPrice" required>
-        </div>
-        <div>
-            <label for="carImage">Car Image:</label>
-            <input type="file" id="carImage" name="carImage" accept="image/*" required>
-        </div>
-        <button type="submit">Add Car</button>
-    </form>
-    <div class="message">
-        <?php
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            echo "New car added successfully.";
-        }
-        ?>
+    <!-- Background Effects -->
+    <div class="background-iframe-container">
+        <iframe src="index.php" frameborder="0"></iframe>
+        <div class="overlay-vignette"></div>
     </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Add Vehicle</h1>
+            <a href="admin_dash.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </header>
+
+        <form action="add_car.php" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="carid">Car ID</label>
+                <input type="text" id="carid" name="carid" placeholder="e.g. CAR001" required>
+            </div>
+            <div class="form-group">
+                <label for="carName">Car Name</label>
+                <input type="text" id="carName" name="carName" placeholder="e.g. Toyota Prado" required>
+            </div>
+            <div class="form-group">
+                <label for="carModel">Car Model</label>
+                <input type="text" id="carModel" name="carModel" placeholder="e.g. VX" required>
+            </div>
+            <div class="form-group">
+                <label for="carYear">Year</label>
+                <input type="number" id="carYear" name="carYear" placeholder="e.g. 2024" required>
+            </div>
+            <div class="form-group">
+                <label for="carPrice">Price per Day (NRS)</label>
+                <input type="number" id="carPrice" name="carPrice" placeholder="e.g. 5000" required>
+            </div>
+            <div class="form-group">
+                <label for="carType">Car Type</label>
+                <select id="carType" name="carType" required>
+                    <option value="" disabled selected>Select type</option>
+                    <option value="Sedan">Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Hatchback">Hatchback</option>
+                    <option value="Luxury">Luxury</option>
+                    <option value="Vintage">Vintage</option>
+                </select>
+            </div>
+            <div class="form-group full-width">
+                <label for="carImage">Vehicle Image</label>
+                <input type="file" id="carImage" name="carImage" accept="image/*" required>
+            </div>
+            <button type="submit">Submit to Fleet</button>
+        </form>
+    </div>
+
+    <?php if ($_SERVER["REQUEST_METHOD"] == "POST"): ?>
+        <div class="message <?php echo $uploadOk ? 'success' : 'error'; ?>">
+            <i class="fas <?php echo $uploadOk ? 'fa-check-circle' : 'fa-exclamation-circle'; ?>"></i>
+            <?php
+            if ($uploadOk) {
+                echo "Success: New vehicle added to the fleet.";
+            } else {
+                echo "Error: Could not add vehicle. Please check file format.";
+            }
+            ?>
+        </div>
+    <?php endif; ?>
 </body>
-</html> 
+</html>

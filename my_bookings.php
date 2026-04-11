@@ -38,7 +38,7 @@ if (isset($_SESSION['message'])) {
 
 // Fetch booking details with car names based on email
 $sql = "SELECT b.*, c.name as car_name, c.model as car_model, c.carid, 
-        b.booking_from, b.booking_to, c.price as car_price
+        b.booking_from, b.booking_to, b.esewa_status, c.price as car_price
         FROM bookings b 
         LEFT JOIN cars c ON b.carid = c.carid 
         WHERE b.email = ?";
@@ -88,200 +88,118 @@ foreach ($bookings as $booking) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Bookings - Car Rental Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent-color: #00c6ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4; /* Light background color */
+            font-family: 'Outfit', sans-serif;
+            background-color: #030303;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .dashboard-container {
-            display: flex; /* Use flexbox for layout */
-            height: 100vh; /* Full height of the viewport */
+        /* Background Effects */
+        .background-iframe-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            overflow: hidden;
         }
-
-        .sidebar {
-            width: 250px; /* Width of the sidebar */
-            background-color: #007bff; /* Sidebar background color */
-            color: white; /* Text color */
-            padding: 20px; /* Padding inside the sidebar */
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Shadow effect */
-            display: flex;
-            flex-direction: column; /* Stack items vertically */
-            justify-content: flex-start; /* Align items to the top */
+        .background-iframe-container iframe {
+            width: 100%; height: 100%; border: none; pointer-events: none;
+            transform: scale(1.1); filter: brightness(0.2) blur(10px);
         }
-
-        .sidebar h2 {
-            margin: 0 0 20px; /* Margin for the heading */
-        }
-
-        .sidebar ul {
-            list-style-type: none; /* Remove bullet points */
-            padding: 0; /* Remove padding */
-            margin: 0; /* Remove margin */
-        }
-
-        .sidebar ul li {
-            margin: 10px 0; /* Margin between items */
-        }
-
-        .sidebar ul li a {
-            color: white; /* Link color */
-            text-decoration: none; /* Remove underline */
-            display: block; /* Make the link fill the list item */
-            padding: 10px; /* Padding for the link */
-            transition: background-color 0.3s; /* Smooth transition for hover effect */
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #0056b3; /* Darker background on hover */
+        .overlay-vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
         }
 
         .bookings-container {
-            margin: 20px auto;
-            max-width: 1200px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            flex: 1; /* Take the remaining space */
-            overflow-y: auto; /* Allow scrolling if content overflows */
+            width: 95%; max-width: 1200px; margin: 80px auto 40px;
+            padding: 40px; background: var(--glass-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            position: relative; z-index: 10;
         }
 
-        .bookings-table {
-            width: 100%;
-            border-collapse: collapse; /* Remove space between borders */
-            margin-top: 20px;
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 10px; color: var(--text-muted);
+            text-decoration: none; transition: all 0.3s ease; font-weight: 500; margin-bottom: 20px;
+        }
+        .back-btn:hover { color: var(--text-main); transform: translateX(-5px); }
+
+        h2 {
+            font-size: 2.5rem; font-weight: 600; background: var(--primary-gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px;
         }
 
-        .bookings-table th, .bookings-table td {
-            padding: 12px; /* Padding for table cells */
-            text-align: left; /* Align text to the left */
-            border-bottom: 1px solid #ddd; /* Bottom border for rows */
+        /* Table Styling */
+        .bookings-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: 20px; }
+        
+        .bookings-table th { 
+            text-align: left; padding: 20px; color: var(--text-muted); font-size: 13px; 
+            text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
         }
-
-        /* Date column styling */
-        .bookings-table td:nth-child(2),
-        .bookings-table td:nth-child(3) {
-            min-width: 100px;
-            white-space: nowrap;
+        
+        .bookings-table td { 
+            padding: 20px; background: rgba(255, 255, 255, 0.03); 
+            border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); 
+            color: var(--text-main);
         }
+        
+        .bookings-table td:first-child { border-left: 1px solid var(--glass-border); border-radius: 12px 0 0 12px; font-weight: 600; color: var(--accent-color); }
+        .bookings-table td:last-child { border-right: 1px solid var(--glass-border); border-radius: 0 12px 12px 0; }
+        
+        .bookings-table tr:hover td { background: rgba(255, 255, 255, 0.07); }
 
-        .bookings-table th {
-            background-color: #007bff; /* Header background color */
-            color: white; /* Header text color */
-            font-weight: bold; /* Bold text for headers */
-        }
-
-        .bookings-table tr:hover {
-            background-color: #f1f1f1; /* Highlight row on hover */
-        }
-
-        .cancel-btn {
-            background-color: #dc3545; /* Red background for cancel button */
-            color: white; /* White text color */
-            padding: 8px 12px; /* Padding for button */
-            border: none; /* Remove border */
-            border-radius: 5px; /* Rounded corners */
-            text-decoration: none; /* Remove underline */
-            transition: background-color 0.3s; /* Smooth transition */
-        }
-
-        .cancel-btn:hover {
-            background-color: #c82333; /* Darker red on hover */
-        }
-
-        .notification {
-            background-color: #ffcc00; /* Yellow background */
-            color: #333; /* Dark text color */
-            padding: 15px; /* Padding around the text */
-            text-align: center; /* Center the text */
-            border-radius: 5px; /* Rounded corners */
-            margin: 20px 0; /* Space above and below */
-            font-weight: bold; /* Bold text */
-        }
-
-        /* Add status badge styles */
+        /* Status Badges */
         .status-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9em;
-            font-weight: bold;
+            padding: 6px 14px; border-radius: 50px; font-size: 0.75rem; 
+            font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+            display: inline-block;
         }
-        .status-approved {
-            background-color: #28a745;
-            color: white;
-        }
-        .status-declined {
-            background-color: #dc3545;
-            color: white;
-        }
-        .status-pending {
-            background-color: #ffc107;
-            color: black;
-        }
-        .status-cancelled {
-            background-color: #6c757d;
-            color: white;
-        }
+        .status-approved { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .status-declined { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .status-cancelled { background: rgba(107, 114, 128, 0.2); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.4); }
 
-        /* Total amount styling */
-        .total-amount {
-            font-weight: bold;
-            color: #28a745;
-            font-size: 1.1em;
-        }
-
-        /* Add a subtle background to highlight the total amount */
-        td.total-amount {
-            background-color: #f8fff9;
-        }
+        .total-amount { color: #10b981; font-weight: 600; font-family: monospace; font-size: 1.1em; }
 
         .booking-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #28a745;
-            color: white;
-            padding: 15px 0;
+            margin-top: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
             text-align: center;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            color: #10b981;
         }
 
-        .success-message {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .success-message p:first-child { font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; }
 
-        .success-message p {
-            margin: 5px 0;
-            font-size: 1.1em;
-        }
-
-        .success-message p:first-child {
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        /* Add padding to prevent content from being hidden behind fixed footer */
-        .bookings-container {
-            padding-bottom: 100px;
-        }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <h2>Dashboard</h2>
-            <ul>
-                <li><a href="my_bookings.php">My Bookings</a></li>
-                <li><a href="my_profile.php">My Profile</a></li>
-                <li><a href="index.php">Back to Home</a></li>
-            </ul>
-        </aside>
-        <main class="bookings-container">
+    <div class="background-iframe-container">
+        <iframe src="index.php" frameborder="0"></iframe>
+        <div class="overlay-vignette"></div>
+    </div>
+
+    <div class="bookings-container">
+        <a href="dashboard.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <main>
             <h2>My Bookings</h2>
             <table class="bookings-table">
                 <thead>
@@ -292,6 +210,7 @@ foreach ($bookings as $booking) {
                         <th>Pickup Location</th>
                         <th>Drop-off Location</th>
                         <th>Total Amount</th>
+                        <th>Transaction Status</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -331,21 +250,15 @@ foreach ($bookings as $booking) {
                                 ?></td>
                                 <td>
                                     <?php 
+                                        $eStatus = htmlspecialchars($booking['esewa_status'] ?? 'Pending');
+                                        $eClass = $eStatus == 'Completed' ? 'status-approved' : 'status-pending';
+                                        echo "<span class='status-badge $eClass'>" . $eStatus . "</span>";
+                                    ?>
+                                </td>
+                                <td>
+                                    <?php 
                                         $status = strtolower(htmlspecialchars($booking['status'] ?? 'pending'));
-                                        $statusClass = '';
-                                        switch($status) {
-                                            case 'approved':
-                                                $statusClass = 'status-approved';
-                                                break;
-                                            case 'declined':
-                                                $statusClass = 'status-declined';
-                                                break;
-                                            case 'cancelled':
-                                                $statusClass = 'status-cancelled';
-                                                break;
-                                            default:
-                                                $statusClass = 'status-pending';
-                                        }
+                                        $statusClass = 'status-' . $status;
                                         echo "<span class='status-badge $statusClass'>" . ucfirst($status) . "</span>";
                                     ?>
                                 </td>
@@ -353,14 +266,13 @@ foreach ($bookings as $booking) {
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 20px;">No bookings found</td>
+                            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">No bookings found</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </main>
         <?php
-        // Check if any booking is approved
         $hasApprovedBooking = false;
         foreach ($bookings as $booking) {
             if ($booking['status'] === 'approved') {
@@ -369,12 +281,12 @@ foreach ($bookings as $booking) {
             }
         }
         if ($hasApprovedBooking): ?>
-            <footer class="booking-footer">
+            <div class="booking-footer">
                 <div class="success-message">
-                    <p>✓ Your booking has been successfully approved!</p>
-                    <p>Please wait for our call. We will contact you shortly for car delivery.</p>
+                    <p><i class="fas fa-check-circle"></i> Your booking has been approved!</p>
+                    <p>Please wait for our call. We will contact you shortly to coordinate delivery.</p>
                 </div>
-            </footer>
+            </div>
         <?php endif; ?>
     </div>
 </body>

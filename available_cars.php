@@ -33,8 +33,18 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Available Cars - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        /* Basic Reset */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent-color: #ff4b2b;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -42,174 +52,204 @@ $result = $conn->query($sql);
         }
 
         body {
-            display: flex;
-            font-family: Arial, sans-serif;
-            background-color:rgb(197, 17, 17);
-            height: 100vh; /* Ensure body takes full height */
+            font-family: 'Outfit', sans-serif;
+            background-color: #030303;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .sidebar {
-            width: 250px;
-            background-color: #007BFF;
-            color: white;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            height: 100vh; /* Full height sidebar */
-            position: fixed; /* Fix the sidebar to the left */
+        /* Background Effects */
+        .background-iframe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
         }
 
-        .sidebar h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
+        .background-iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+            transform: scale(1.1);
+            filter: brightness(0.2) blur(10px);
         }
 
-        .sidebar a {
-            display: block;
-            margin: 10px 0;
-            text-decoration: none;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .sidebar a:hover {
-            background-color: #0056b3;
+        .overlay-vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
         }
 
         .main-content {
-            flex-grow: 1;
-            padding: 20px;
-            margin-left: 250px; /* Leave space for the sidebar */
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            position: relative;
+            z-index: 10;
         }
 
-        .section {
-            display: none; /* Hide all sections by default */
-        }
-
-        .active {
-            display: block; /* Show active section */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
         }
 
         h1 {
-            margin-bottom: 20px;
-            font-size: 28px;
-            color: #333;
+            font-size: 32px;
+            font-weight: 600;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        form {
-            margin-top: 20px;
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
 
-        form div {
-            margin-bottom: 15px;
+        .back-btn:hover {
+            color: var(--text-main);
+            transform: translateX(-5px);
         }
 
-        form label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        form input {
+        /* Table Styling */
+        .table-container {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3;
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-collapse: separate;
+            border-spacing: 0 10px;
         }
 
         th {
-            background-color: #007BFF;
-            color: white;
+            text-align: left;
+            padding: 20px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
         }
 
-        tr:hover {
-            background-color: #f1f1f1;
+        td {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
         }
 
-        a {
-            color: #007BFF;
+        td:first-child {
+            border-left: 1px solid var(--glass-border);
+            border-radius: 12px 0 0 12px;
+        }
+
+        td:last-child {
+            border-right: 1px solid var(--glass-border);
+            border-radius: 0 12px 12px 0;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .action-links a {
+            color: var(--text-main);
             text-decoration: none;
+            margin-right: 15px;
+            font-size: 14px;
+            transition: color 0.3s;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .action-links a:hover {
+            color: #ff4b2b;
+        }
+
+        .delete-link {
+            color: #ff4d4d !important;
+        }
+
+        .price-badge {
+            background: var(--primary-gradient);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2>Admin Dashboard</h2>
-        <p>Welcome admin <?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Guest'; ?>.</p>
-        <a href="admin_dash.php">Dashboard</a>
-        <a href="available_cars.php">Available Cars</a>
-        <a href="booked_cars.php">Booked Cars</a>
-        <a href="reports.php">Reports</a>
-        <a href="admin_login.php?action=logout" class="logout-btn">Logout</a>
+    <!-- Background Effects -->
+    <div class="background-iframe-container">
+        <iframe src="index.php" frameborder="0"></iframe>
+        <div class="overlay-vignette"></div>
     </div>
 
     <div class="main-content">
-        <h1>Available Cars</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Car ID</th>
-                    <th>Car Name</th>
-                    <th>Model</th>
-                    <th>Year</th>
-                    <th>Price per Day</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if ($result->num_rows > 0): ?>
-                    <?php while($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['carid']); ?></td>
-                            <td><?php echo htmlspecialchars($row['name']); ?></td>
-                            <td><?php echo htmlspecialchars($row['model']); ?></td>
-                            <td><?php echo htmlspecialchars($row['year']); ?></td>
-                            <td>NRS <?php echo htmlspecialchars($row['price']); ?></td>
-                            <td>
-                                <a href="update_car.php?id=<?php echo $row['carid']; ?>">Update</a> | 
-                                <a href="delete_car.php?id=<?php echo $row['carid']; ?>" onclick="return confirm('Are you sure you want to delete this car?');">Delete</a>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                <?php else: ?>
+        <header>
+            <h1>Available Cars</h1>
+            <a href="admin_dash.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </header>
+
+        <div class="table-container">
+            <table>
+                <thead>
                     <tr>
-                        <td colspan="6">No available cars found.</td>
+                        <th>Car ID</th>
+                        <th>Car Name</th>
+                        <th>Model</th>
+                        <th>Year</th>
+                        <th>Price/Day</th>
+                        <th>Actions</th>
                     </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php if ($result->num_rows > 0): ?>
+                        <?php while($row = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td style="font-family: monospace; color: var(--accent-color); font-weight: 600;">#<?php echo htmlspecialchars($row['carid']); ?></td>
+                                <td style="font-weight: 600;"><?php echo htmlspecialchars($row['name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['model']); ?></td>
+                                <td><?php echo htmlspecialchars($row['year']); ?></td>
+                                <td><span class="price-badge">NRS <?php echo number_format($row['price']); ?></span></td>
+                                <td class="action-links">
+                                    <a href="update_car.php?id=<?php echo $row['carid']; ?>"><i class="fas fa-edit"></i> Edit</a>
+                                    <a href="delete_car.php?id=<?php echo $row['carid']; ?>" class="delete-link" onclick="return confirm('Are you sure you want to delete this car?');"><i class="fas fa-trash"></i> Delete</a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">No available cars found in the fleet.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <?php

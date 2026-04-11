@@ -33,16 +33,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $bookingFrom = $_POST['booking_from'];
     $bookingTo = $_POST['booking_to'];
     $bookingTime = $_POST['booking_time'];
+    $amount = $_POST['amount']; // Get amount
+    $paymentMethod = $_POST['payment_method']; // Get payment method
     $status = 'pending'; // Set initial status to pending
 
-    // Insert booking into the database
-    $stmt = $conn->prepare("INSERT INTO bookings (name, carid, email, phone, pickup_location, dropoff_location, booking_from, booking_to, booking_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssssss", $username, $carId, $email, $phone, $pickupLocation, $dropoffLocation, $bookingFrom, $bookingTo, $bookingTime, $status);
-    $stmt->execute();
+    // Check Availability Algorithm
+    include_once 'algorithms/booking_algorithm.php';
+    
+    if (!isCarAvailable($conn, $carId, $bookingFrom, $bookingTo)) {
+        // If not available -> show "Not Available"
+        echo "<script>alert('Not Available for the selected dates.'); window.history.back();</script>";
+        exit();
+    }
 
-    // Redirect with success message
-    $_SESSION['success_message'] = "Successfully booked the car."; // Set success message in session
-    header("Location: dashboard.php"); // Redirect to dashboard
+    // Insert booking into the database
+    // Note: Column name is `total money` with a space
+    $stmt = $conn->prepare("INSERT INTO bookings (name, carid, email, phone, pickup_location, dropoff_location, booking_from, booking_to, booking_time, status, `total money`, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssssssds", $username, $carId, $email, $phone, $pickupLocation, $dropoffLocation, $bookingFrom, $bookingTo, $bookingTime, $status, $amount, $paymentMethod);
+    $stmt->execute();
+    
+    // Get the inserted booking ID
+    $bookingId = $conn->insert_id;
+
+    // Store booking details in session for payment page
+    $_SESSION['pending_payment_booking_id'] = $bookingId;
+    $_SESSION['pending_payment_amount'] = $amount;
+    
+    // Redirect based on payment method
+    if ($paymentMethod === 'online') {
+        // Redirect to payment page for online payment
+        header("Location: booking_payment.php");
+    } else {
+        // Redirect to dashboard for cash on delivery
+        $_SESSION['success_message'] = "Successfully booked the car. Payment will be collected on delivery.";
+        header("Location: dashboard.php");
+    }
     exit();
 }
 

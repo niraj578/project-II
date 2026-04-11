@@ -1,33 +1,11 @@
 <?php
-session_start(); // Start the session
-
-// Check if the user is logged in
+session_start();
 $isLoggedIn = isset($_SESSION['login']);
 if (!$isLoggedIn) {
-    header("Location: login.php"); // Redirect to login if not logged in
+    header("Location: login.php");
     exit();
 }
-
-$username = $_SESSION['login']['full_name']; // Get the username
-
-$host = 'localhost'; // Database host
-$db = 'carrentaldb'; // Database name
-$user = 'root'; // Database username
-$pass = ''; // Database password
-$charset = 'utf8mb4';
-
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
-
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    throw new \PDOException($e->getMessage(), (int)$e->getCode());
-}
+$username = $_SESSION['login']['full_name'];
 ?>
 
 <!DOCTYPE html>
@@ -36,164 +14,107 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - Car Rental Service</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --accent-color: #00c6ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #030303;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: block; /* Override flex */
+        }
+
+        .background-iframe-container {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden;
+        }
+        .background-iframe-container iframe {
+            width: 100%; height: 100%; border: none; pointer-events: none;
+            transform: scale(1.1); filter: brightness(0.2) blur(10px);
+        }
+        .overlay-vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+        }
+
+        .main-content {
+            width: 95%; max-width: 600px; margin: 100px auto 40px;
+            padding: 50px; background: var(--glass-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            position: relative; z-index: 10; text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px; height: 100px; background: var(--primary-gradient);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: white; margin: 0 auto 30px;
+            box-shadow: 0 10px 30px rgba(0, 198, 255, 0.4);
+        }
+
+        h1 {
+            font-size: 2.5rem; font-weight: 600; margin-bottom: 10px;
+        }
+        h1 span {
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        
+        p.welcome-text { color: var(--text-muted); margin-bottom: 40px; font-size: 1.1rem; }
+
+        .profile-actions {
+            display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; margin: 0 auto;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.05); color: white; text-decoration: none;
+            padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);
+            font-weight: 500; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .action-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+
+        .logout-btn { border-color: rgba(239, 68, 68, 0.5); color: #ff6b6b; }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .back-link {
+            display: inline-block; margin-top: 30px; color: var(--text-muted);
+            text-decoration: none; transition: 0.3s; font-size: 0.9rem;
+        }
+        .back-link:hover { color: #00c6ff; }
+
+    </style>
 </head>
 <body>
-    <style>
-/* General Page Styling */
-body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f4f8;
-    display: flex;
-}
+    <div class="background-iframe-container">
+        <iframe src="index.php" frameborder="0"></iframe>
+        <div class="overlay-vignette"></div>
+    </div>
 
-/* Sidebar Styling */
-.sidebar {
-    width: 250px;
-    background-color: #007bff;
-    color: white;
-    padding: 20px;
-    height: 100vh;
-    position: fixed;
-}
-
-.sidebar h2 {
-    margin-bottom: 20px;
-}
-
-.sidebar ul {
-    list-style: none;
-    padding: 0;
-}
-
-.sidebar ul li {
-    margin: 15px 0;
-}
-
-.sidebar ul li a {
-    color: white;
-    text-decoration: none;
-    display: block;
-    padding: 10px;
-    transition: background-color 0.3s;
-}
-
-.sidebar ul li a:hover {
-    background-color: #0056b3;
-    border-radius: 5px;
-}
-
-/* Main Content Styling */
-.main-content {
-    margin-left: 270px;
-    padding: 20px;
-    background-color: white;
-    width: calc(100% - 270px);
-    min-height: 100vh;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-h1 {
-    color: #333;
-    font-size: 2.5rem;
-    text-align: center;
-}
-
-/* Profile Options Styling */
-.profile-options {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-top: 20px;
-}
-
-.profile-options h2 {
-    color: #007BFF;
-    font-size: 1.8rem;
-    text-align: center;
-}
-
-.profile-options ul {
-    list-style: none;
-    padding: 0;
-    text-align: center;
-}
-
-.profile-options li {
-    margin: 10px 0;
-}
-
-.profile-options a {
-    text-decoration: none;
-    color: #007BFF;
-    padding: 10px;
-    border: 2px solid #007BFF;
-    border-radius: 5px;
-    display: inline-block;
-    transition: background-color 0.3s, color 0.3s;
-    font-weight: bold;
-    width: 200px;
-}
-
-.profile-options a:hover {
-    background-color: #007BFF;
-    color: white;
-}
-
-/* Logout Button Styling */
-.logout-btn {
-    color: red !important;
-    border-color: red !important;
-}
-
-.logout-btn:hover {
-    background-color: red !important;
-    color: white !important;
-}
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        text-align: center;
-    }
-
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-        padding: 10px;
-    }
-
-    .profile-options a {
-        width: 100%;
-    }
-}
-</style>
-
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <h2>My Profile</h2>
-            <ul>
-                
-                <li><a href="my_bookings.php">My Bookings</a></li>
-                <li><a href="payments.php">Payments</a></li>
-                <li><a href="dashboard.php">Back to Dashboard</a></li>
-                <li><a href="logout.php" class="logout-btn">Logout</a></li>
-            </ul>
+    <div class="main-content">
+        <div class="profile-avatar">
+            <?php echo strtoupper(substr($username, 0, 1)); ?>
         </div>
-        
+        <h1>Hello, <span><?php echo htmlspecialchars($username); ?></span></h1>
+        <p class="welcome-text">Manage your account and bookings</p>
 
-        <div class="main-content">
-            <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
-
-            </div>
+        <div class="profile-actions">
+            <a href="my_bookings.php" class="action-btn"><i class="fas fa-calendar-check"></i> My Bookings</a>
+            <a href="user_messages.php" class="action-btn"><i class="fas fa-envelope"></i> My Messages</a>
+            <a href="logout.php" class="action-btn logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
+
+        <a href="dashboard.php" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
     </div>
 </body>
 </html>

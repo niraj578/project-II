@@ -1,4 +1,40 @@
-Name: Danfe College
-Email: admin@gmail.com
+Name: niraj pandey
+Email: np694212@gmail.com
+Message: hello
+
+Name: niraj pandey
+Email: np694212@gmail.com
 Message: hi
+
+Name: tul
+Email: anju@gmail.com
+Message: hi
+
+Name: gagan
+Email: nirajpandey83@yahoo.com
+Message: hello 
+
+Name: anju khatri
+Email: anju@gmail.com
+Message: ggggg
+
+Name: tul sir
+Email: tul12@gmail.com
+Message: vayo ni 
+
+Name: tul sir
+Email: tul12@gmail.com
+Message: k xa
+
+Name: tul sir
+Email: tul12@gmail.com
+Message: hello admin 
+
+Name: tul sir
+Email: tul12@gmail.com
+Message: hi
+
+Name: niraj pandey
+Email: np694212@gmail.com
+Message: hello 
 
